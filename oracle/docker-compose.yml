@@ -1,0 +1,11 @@
+version: '3'
+services:
+  oracle:
+    build:
+      context: ./image
+    ports:
+      - 1521:1521
+    image: st_and_db_1_oracle_image
+    container_name: st_and_db_1_oracle
+    volumes:
+      - ~/st_and_db_labs_data/oracle:/opt/oracle/oradata
