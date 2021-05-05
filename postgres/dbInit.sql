@@ -1,7 +1,7 @@
 CREATE TABLE Universities
 (
     id                       BIGSERIAL PRIMARY KEY,
-    name                     VARCHAR(100) NOT NULL,
+    name                     VARCHAR(150) NOT NULL,
     new_educational_standard BOOLEAN      NOT NULL
 );
 
@@ -57,7 +57,7 @@ CREATE TABLE Disciplines
     lecture_hours      INT          NOT NULL,
     practice_hours     INT          NOT NULL,
     lab_works_hours    INT          NOT NULL,
-    final_test_type_id INT          NOT NULL REFERENCES Final_test_types (id),
+    final_test_type_id BIGINT          NOT NULL REFERENCES Final_test_types (id),
     UNIQUE (specialization_id, code, name, semester_number)
 );
 
