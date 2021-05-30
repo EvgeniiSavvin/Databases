@@ -43,28 +43,25 @@ trait Tables {
 
     /** Foreign key referencing Universities (database name departments_university_id_fkey) */
     lazy val universitiesFk = foreignKey("departments_university_id_fkey", universityId, Universities)(r => r.id, onUpdate=ForeignKeyAction.NoAction, onDelete=ForeignKeyAction.NoAction)
-
-    /** Uniqueness Index over (universityId,name) (database name departments_university_id_name_key) */
-    val index1 = index("departments_university_id_name_key", (universityId, name), unique=true)
   }
   /** Collection-like TableQuery object for table Departments */
   lazy val Departments = new TableQuery(tag => new Departments(tag))
 
   /** Entity class storing rows of table Disciplines
    *  @param id Database column id SqlType(bigserial), AutoInc, PrimaryKey
-   *  @param code Database column code SqlType(varchar), Length(100,true)
+   *  @param code Database column code SqlType(varchar), Length(20,true)
    *  @param name Database column name SqlType(varchar), Length(100,true)
    *  @param specializationId Database column specialization_id SqlType(int8)
    *  @param semesterNumber Database column semester_number SqlType(int4)
    *  @param lectureHours Database column lecture_hours SqlType(int4)
    *  @param practiceHours Database column practice_hours SqlType(int4)
    *  @param labWorksHours Database column lab_works_hours SqlType(int4)
-   *  @param finalTestTypeId Database column final_test_type_id SqlType(int8) */
-  case class DisciplinesRow(id: Long, code: String, name: String, specializationId: Long, semesterNumber: Int, lectureHours: Int, practiceHours: Int, labWorksHours: Int, finalTestTypeId: Long)
+   *  @param finalTestTypeId Database column final_test_type_id SqlType(int4) */
+  case class DisciplinesRow(id: Long, code: String, name: String, specializationId: Long, semesterNumber: Int, lectureHours: Int, practiceHours: Int, labWorksHours: Int, finalTestTypeId: Int)
   /** GetResult implicit for fetching DisciplinesRow objects using plain SQL queries */
   implicit def GetResultDisciplinesRow(implicit e0: GR[Long], e1: GR[String], e2: GR[Int]): GR[DisciplinesRow] = GR{
     prs => import prs._
-    DisciplinesRow.tupled((<<[Long], <<[String], <<[String], <<[Long], <<[Int], <<[Int], <<[Int], <<[Int], <<[Long]))
+    DisciplinesRow.tupled((<<[Long], <<[String], <<[String], <<[Long], <<[Int], <<[Int], <<[Int], <<[Int], <<[Int]))
   }
   /** Table description of table disciplines. Objects of this class serve as prototypes for rows in queries. */
   class Disciplines(_tableTag: Tag) extends profile.api.Table[DisciplinesRow](_tableTag, "disciplines") {
@@ -74,8 +71,8 @@ trait Tables {
 
     /** Database column id SqlType(bigserial), AutoInc, PrimaryKey */
     val id: Rep[Long] = column[Long]("id", O.AutoInc, O.PrimaryKey)
-    /** Database column code SqlType(varchar), Length(100,true) */
-    val code: Rep[String] = column[String]("code", O.Length(100,varying=true))
+    /** Database column code SqlType(varchar), Length(20,true) */
+    val code: Rep[String] = column[String]("code", O.Length(20,varying=true))
     /** Database column name SqlType(varchar), Length(100,true) */
     val name: Rep[String] = column[String]("name", O.Length(100,varying=true))
     /** Database column specialization_id SqlType(int8) */
@@ -88,28 +85,25 @@ trait Tables {
     val practiceHours: Rep[Int] = column[Int]("practice_hours")
     /** Database column lab_works_hours SqlType(int4) */
     val labWorksHours: Rep[Int] = column[Int]("lab_works_hours")
-    /** Database column final_test_type_id SqlType(int8) */
-    val finalTestTypeId: Rep[Long] = column[Long]("final_test_type_id")
+    /** Database column final_test_type_id SqlType(int4) */
+    val finalTestTypeId: Rep[Int] = column[Int]("final_test_type_id")
 
     /** Foreign key referencing FinalTestTypes (database name disciplines_final_test_type_id_fkey) */
     lazy val finalTestTypesFk = foreignKey("disciplines_final_test_type_id_fkey", finalTestTypeId, FinalTestTypes)(r => r.id, onUpdate=ForeignKeyAction.NoAction, onDelete=ForeignKeyAction.NoAction)
     /** Foreign key referencing Specializations (database name disciplines_specialization_id_fkey) */
     lazy val specializationsFk = foreignKey("disciplines_specialization_id_fkey", specializationId, Specializations)(r => r.id, onUpdate=ForeignKeyAction.NoAction, onDelete=ForeignKeyAction.NoAction)
-
-    /** Uniqueness Index over (specializationId,code,name,semesterNumber) (database name disciplines_specialization_id_code_name_semester_number_key) */
-    val index1 = index("disciplines_specialization_id_code_name_semester_number_key", (specializationId, code, name, semesterNumber), unique=true)
   }
   /** Collection-like TableQuery object for table Disciplines */
   lazy val Disciplines = new TableQuery(tag => new Disciplines(tag))
 
   /** Entity class storing rows of table FinalTestTypes
-   *  @param id Database column id SqlType(bigserial), AutoInc, PrimaryKey
+   *  @param id Database column id SqlType(int4), PrimaryKey
    *  @param name Database column name SqlType(varchar), Length(50,true), Default(None) */
-  case class FinalTestTypesRow(id: Long, name: Option[String] = None)
+  case class FinalTestTypesRow(id: Int, name: Option[String] = None)
   /** GetResult implicit for fetching FinalTestTypesRow objects using plain SQL queries */
-  implicit def GetResultFinalTestTypesRow(implicit e0: GR[Long], e1: GR[Option[String]]): GR[FinalTestTypesRow] = GR{
+  implicit def GetResultFinalTestTypesRow(implicit e0: GR[Int], e1: GR[Option[String]]): GR[FinalTestTypesRow] = GR{
     prs => import prs._
-    FinalTestTypesRow.tupled((<<[Long], <<?[String]))
+    FinalTestTypesRow.tupled((<<[Int], <<?[String]))
   }
   /** Table description of table final_test_types. Objects of this class serve as prototypes for rows in queries. */
   class FinalTestTypes(_tableTag: Tag) extends profile.api.Table[FinalTestTypesRow](_tableTag, "final_test_types") {
@@ -117,8 +111,8 @@ trait Tables {
     /** Maps whole row to an option. Useful for outer joins. */
     def ? = ((Rep.Some(id), name)).shaped.<>({r=>import r._; _1.map(_=> FinalTestTypesRow.tupled((_1.get, _2)))}, (_:Any) =>  throw new Exception("Inserting into ? projection not supported."))
 
-    /** Database column id SqlType(bigserial), AutoInc, PrimaryKey */
-    val id: Rep[Long] = column[Long]("id", O.AutoInc, O.PrimaryKey)
+    /** Database column id SqlType(int4), PrimaryKey */
+    val id: Rep[Int] = column[Int]("id", O.PrimaryKey)
     /** Database column name SqlType(varchar), Length(50,true), Default(None) */
     val name: Rep[Option[String]] = column[Option[String]]("name", O.Length(50,varying=true), O.Default(None))
   }
@@ -126,13 +120,13 @@ trait Tables {
   lazy val FinalTestTypes = new TableQuery(tag => new FinalTestTypes(tag))
 
   /** Entity class storing rows of table Grades
-   *  @param id Database column id SqlType(bigserial), AutoInc, PrimaryKey
+   *  @param id Database column id SqlType(int4), PrimaryKey
    *  @param name Database column name SqlType(varchar), Length(50,true), Default(None) */
-  case class GradesRow(id: Long, name: Option[String] = None)
+  case class GradesRow(id: Int, name: Option[String] = None)
   /** GetResult implicit for fetching GradesRow objects using plain SQL queries */
-  implicit def GetResultGradesRow(implicit e0: GR[Long], e1: GR[Option[String]]): GR[GradesRow] = GR{
+  implicit def GetResultGradesRow(implicit e0: GR[Int], e1: GR[Option[String]]): GR[GradesRow] = GR{
     prs => import prs._
-    GradesRow.tupled((<<[Long], <<?[String]))
+    GradesRow.tupled((<<[Int], <<?[String]))
   }
   /** Table description of table grades. Objects of this class serve as prototypes for rows in queries. */
   class Grades(_tableTag: Tag) extends profile.api.Table[GradesRow](_tableTag, "grades") {
@@ -140,8 +134,8 @@ trait Tables {
     /** Maps whole row to an option. Useful for outer joins. */
     def ? = ((Rep.Some(id), name)).shaped.<>({r=>import r._; _1.map(_=> GradesRow.tupled((_1.get, _2)))}, (_:Any) =>  throw new Exception("Inserting into ? projection not supported."))
 
-    /** Database column id SqlType(bigserial), AutoInc, PrimaryKey */
-    val id: Rep[Long] = column[Long]("id", O.AutoInc, O.PrimaryKey)
+    /** Database column id SqlType(int4), PrimaryKey */
+    val id: Rep[Int] = column[Int]("id", O.PrimaryKey)
     /** Database column name SqlType(varchar), Length(50,true), Default(None) */
     val name: Rep[Option[String]] = column[Option[String]]("name", O.Length(50,varying=true), O.Default(None))
   }
@@ -194,20 +188,20 @@ trait Tables {
    *  @param id Database column id SqlType(bigserial), AutoInc, PrimaryKey
    *  @param code Database column code SqlType(varchar), Length(10,true)
    *  @param name Database column name SqlType(varchar), Length(100,true)
-   *  @param grade Database column grade SqlType(int8), Default(None)
-   *  @param departmentId Database column department_id SqlType(int8), Default(None)
+   *  @param grade Database column grade SqlType(int4)
+   *  @param departmentId Database column department_id SqlType(int8)
    *  @param fullTime Database column full_time SqlType(bool) */
-  case class SpecializationsRow(id: Long, code: String, name: String, grade: Option[Long] = None, departmentId: Option[Long] = None, fullTime: Boolean)
+  case class SpecializationsRow(id: Long, code: String, name: String, grade: Int, departmentId: Long, fullTime: Boolean)
   /** GetResult implicit for fetching SpecializationsRow objects using plain SQL queries */
-  implicit def GetResultSpecializationsRow(implicit e0: GR[Long], e1: GR[String], e2: GR[Option[Long]], e3: GR[Boolean]): GR[SpecializationsRow] = GR{
+  implicit def GetResultSpecializationsRow(implicit e0: GR[Long], e1: GR[String], e2: GR[Int], e3: GR[Boolean]): GR[SpecializationsRow] = GR{
     prs => import prs._
-    SpecializationsRow.tupled((<<[Long], <<[String], <<[String], <<?[Long], <<?[Long], <<[Boolean]))
+    SpecializationsRow.tupled((<<[Long], <<[String], <<[String], <<[Int], <<[Long], <<[Boolean]))
   }
   /** Table description of table specializations. Objects of this class serve as prototypes for rows in queries. */
   class Specializations(_tableTag: Tag) extends profile.api.Table[SpecializationsRow](_tableTag, "specializations") {
     def * = (id, code, name, grade, departmentId, fullTime) <> (SpecializationsRow.tupled, SpecializationsRow.unapply)
     /** Maps whole row to an option. Useful for outer joins. */
-    def ? = ((Rep.Some(id), Rep.Some(code), Rep.Some(name), grade, departmentId, Rep.Some(fullTime))).shaped.<>({r=>import r._; _1.map(_=> SpecializationsRow.tupled((_1.get, _2.get, _3.get, _4, _5, _6.get)))}, (_:Any) =>  throw new Exception("Inserting into ? projection not supported."))
+    def ? = ((Rep.Some(id), Rep.Some(code), Rep.Some(name), Rep.Some(grade), Rep.Some(departmentId), Rep.Some(fullTime))).shaped.<>({r=>import r._; _1.map(_=> SpecializationsRow.tupled((_1.get, _2.get, _3.get, _4.get, _5.get, _6.get)))}, (_:Any) =>  throw new Exception("Inserting into ? projection not supported."))
 
     /** Database column id SqlType(bigserial), AutoInc, PrimaryKey */
     val id: Rep[Long] = column[Long]("id", O.AutoInc, O.PrimaryKey)
@@ -215,20 +209,17 @@ trait Tables {
     val code: Rep[String] = column[String]("code", O.Length(10,varying=true))
     /** Database column name SqlType(varchar), Length(100,true) */
     val name: Rep[String] = column[String]("name", O.Length(100,varying=true))
-    /** Database column grade SqlType(int8), Default(None) */
-    val grade: Rep[Option[Long]] = column[Option[Long]]("grade", O.Default(None))
-    /** Database column department_id SqlType(int8), Default(None) */
-    val departmentId: Rep[Option[Long]] = column[Option[Long]]("department_id", O.Default(None))
+    /** Database column grade SqlType(int4) */
+    val grade: Rep[Int] = column[Int]("grade")
+    /** Database column department_id SqlType(int8) */
+    val departmentId: Rep[Long] = column[Long]("department_id")
     /** Database column full_time SqlType(bool) */
     val fullTime: Rep[Boolean] = column[Boolean]("full_time")
 
     /** Foreign key referencing Departments (database name specializations_department_id_fkey) */
-    lazy val departmentsFk = foreignKey("specializations_department_id_fkey", departmentId, Departments)(r => Rep.Some(r.id), onUpdate=ForeignKeyAction.NoAction, onDelete=ForeignKeyAction.NoAction)
+    lazy val departmentsFk = foreignKey("specializations_department_id_fkey", departmentId, Departments)(r => r.id, onUpdate=ForeignKeyAction.NoAction, onDelete=ForeignKeyAction.NoAction)
     /** Foreign key referencing Grades (database name specializations_grade_fkey) */
-    lazy val gradesFk = foreignKey("specializations_grade_fkey", grade, Grades)(r => Rep.Some(r.id), onUpdate=ForeignKeyAction.NoAction, onDelete=ForeignKeyAction.NoAction)
-
-    /** Uniqueness Index over (departmentId,code,name,fullTime) (database name specializations_department_id_code_name_full_time_key) */
-    val index1 = index("specializations_department_id_code_name_full_time_key", (departmentId, code, name, fullTime), unique=true)
+    lazy val gradesFk = foreignKey("specializations_grade_fkey", grade, Grades)(r => r.id, onUpdate=ForeignKeyAction.NoAction, onDelete=ForeignKeyAction.NoAction)
   }
   /** Collection-like TableQuery object for table Specializations */
   lazy val Specializations = new TableQuery(tag => new Specializations(tag))
@@ -237,19 +228,18 @@ trait Tables {
    *  @param id Database column id SqlType(bigserial), AutoInc, PrimaryKey
    *  @param firstName Database column first_name SqlType(varchar), Length(50,true)
    *  @param middleName Database column middle_name SqlType(varchar), Length(50,true), Default(None)
-   *  @param lastName Database column last_name SqlType(varchar), Length(50,true), Default(None)
-   *  @param specializationId Database column specialization_id SqlType(int8), Default(None) */
-  case class StudentsRow(id: Long, firstName: String, middleName: Option[String] = None, lastName: Option[String] = None, specializationId: Option[Long] = None)
+   *  @param lastName Database column last_name SqlType(varchar), Length(50,true), Default(None) */
+  case class StudentsRow(id: Long, firstName: String, middleName: Option[String] = None, lastName: Option[String] = None)
   /** GetResult implicit for fetching StudentsRow objects using plain SQL queries */
-  implicit def GetResultStudentsRow(implicit e0: GR[Long], e1: GR[String], e2: GR[Option[String]], e3: GR[Option[Long]]): GR[StudentsRow] = GR{
+  implicit def GetResultStudentsRow(implicit e0: GR[Long], e1: GR[String], e2: GR[Option[String]]): GR[StudentsRow] = GR{
     prs => import prs._
-    StudentsRow.tupled((<<[Long], <<[String], <<?[String], <<?[String], <<?[Long]))
+    StudentsRow.tupled((<<[Long], <<[String], <<?[String], <<?[String]))
   }
   /** Table description of table students. Objects of this class serve as prototypes for rows in queries. */
   class Students(_tableTag: Tag) extends profile.api.Table[StudentsRow](_tableTag, "students") {
-    def * = (id, firstName, middleName, lastName, specializationId) <> (StudentsRow.tupled, StudentsRow.unapply)
+    def * = (id, firstName, middleName, lastName) <> (StudentsRow.tupled, StudentsRow.unapply)
     /** Maps whole row to an option. Useful for outer joins. */
-    def ? = ((Rep.Some(id), Rep.Some(firstName), middleName, lastName, specializationId)).shaped.<>({r=>import r._; _1.map(_=> StudentsRow.tupled((_1.get, _2.get, _3, _4, _5)))}, (_:Any) =>  throw new Exception("Inserting into ? projection not supported."))
+    def ? = ((Rep.Some(id), Rep.Some(firstName), middleName, lastName)).shaped.<>({r=>import r._; _1.map(_=> StudentsRow.tupled((_1.get, _2.get, _3, _4)))}, (_:Any) =>  throw new Exception("Inserting into ? projection not supported."))
 
     /** Database column id SqlType(bigserial), AutoInc, PrimaryKey */
     val id: Rep[Long] = column[Long]("id", O.AutoInc, O.PrimaryKey)
@@ -259,11 +249,6 @@ trait Tables {
     val middleName: Rep[Option[String]] = column[Option[String]]("middle_name", O.Length(50,varying=true), O.Default(None))
     /** Database column last_name SqlType(varchar), Length(50,true), Default(None) */
     val lastName: Rep[Option[String]] = column[Option[String]]("last_name", O.Length(50,varying=true), O.Default(None))
-    /** Database column specialization_id SqlType(int8), Default(None) */
-    val specializationId: Rep[Option[Long]] = column[Option[Long]]("specialization_id", O.Default(None))
-
-    /** Foreign key referencing Specializations (database name students_specialization_id_fkey) */
-    lazy val specializationsFk = foreignKey("students_specialization_id_fkey", specializationId, Specializations)(r => Rep.Some(r.id), onUpdate=ForeignKeyAction.NoAction, onDelete=ForeignKeyAction.NoAction)
   }
   /** Collection-like TableQuery object for table Students */
   lazy val Students = new TableQuery(tag => new Students(tag))

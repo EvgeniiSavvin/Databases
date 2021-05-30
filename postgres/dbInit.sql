@@ -9,65 +9,61 @@ CREATE TABLE Departments
 (
     id            BIGSERIAL PRIMARY KEY,
     university_id BIGINT       NOT NULL REFERENCES Universities (id),
-    name          VARCHAR(100) NOT NULL,
-    UNIQUE (university_id, name)
+    name          VARCHAR(100) NOT NULL
 );
 
 CREATE TABLE Grades
 (
-    id   BIGSERIAL PRIMARY KEY,
+    id   INT PRIMARY KEY,
     name VARCHAR(50)
 );
 
-INSERT INTO Grades (name)
-VALUES ('Бакалавр'),
-       ('Магистр'),
-       ('Специалист');
+INSERT INTO Grades (id, name)
+VALUES (1, 'Бакалавр'),
+       (2, 'Магистр'),
+       (3, 'Специалист');
 
 CREATE TABLE Specializations
 (
     id            BIGSERIAL PRIMARY KEY,
     code          VARCHAR(10)  NOT NULL,
     name          VARCHAR(100) NOT NULL,
-    grade         BIGINT REFERENCES Grades (id),
-    department_id BIGINT REFERENCES Departments (id),
-    full_time     BOOLEAN      NOT NULL,
-    UNIQUE (department_id, code, name, full_time)
+    grade         INT          NOT NULL REFERENCES Grades (id),
+    department_id BIGINT       NOT NULL REFERENCES Departments (id),
+    full_time     BOOLEAN      NOT NULL
 );
 
 CREATE TABLE Final_test_types
 (
-    id   BIGSERIAL PRIMARY KEY,
+    id   INT PRIMARY KEY,
     name VARCHAR(50)
 );
 
-INSERT INTO Final_test_types (name)
-VALUES ('Экзамен'),
-       ('Зачет'),
-       ('Дифференцированный зачет');
+INSERT INTO Final_test_types (id, name)
+VALUES (1, 'Экзамен'),
+       (2, 'Зачет'),
+       (3, 'Дифференцированный зачет');
 
 
 CREATE TABLE Disciplines
 (
     id                 BIGSERIAL PRIMARY KEY,
-    code               VARCHAR(100) NOT NULL,
+    code               VARCHAR(20)  NOT NULL,
     name               VARCHAR(100) NOT NULL,
     specialization_id  BIGINT       NOT NULL REFERENCES Specializations (id),
     semester_number    INT          NOT NULL,
     lecture_hours      INT          NOT NULL,
     practice_hours     INT          NOT NULL,
     lab_works_hours    INT          NOT NULL,
-    final_test_type_id BIGINT          NOT NULL REFERENCES Final_test_types (id),
-    UNIQUE (specialization_id, code, name, semester_number)
+    final_test_type_id INT          NOT NULL REFERENCES Final_test_types (id)
 );
 
 CREATE TABLE Students
 (
-    id                BIGSERIAL PRIMARY KEY,
-    first_name        VARCHAR(50) NOT NULL,
-    middle_name       VARCHAR(50),
-    last_name         VARCHAR(50),
-    specialization_id BIGINT REFERENCES Specializations (id)
+    id          BIGSERIAL PRIMARY KEY,
+    first_name  VARCHAR(50) NOT NULL,
+    middle_name VARCHAR(50),
+    last_name   VARCHAR(50)
 );
 
 CREATE TABLE Teachers

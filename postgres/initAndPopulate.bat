@@ -1,0 +1,2 @@
+initPostgres.bat
+populateDb.bat
