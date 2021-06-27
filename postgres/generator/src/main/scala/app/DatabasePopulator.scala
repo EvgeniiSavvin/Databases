@@ -1,10 +1,10 @@
-package main
+package app
 
+import model.Tables._
 import data.SlickDatabaseProvider.PostgresDatabase
-import data.dao.{DepartmentsDao, DisciplinesDao, PerformanceRegistryDao, SpecializationsDao, StudentsDao, TeachersDao, UniversitiesDao}
+import data.dao._
 import generators.DepartmentsGenerator.generateDepartmentsForUniversityId
-import generators.{DepartmentsGenerator, DisciplinesGenerator, PerformanceRegistryGenerator, PersonGenerator, SpecializationsGenerator, UniversitiesGenerator}
-import model.Tables.{DepartmentsRow, DisciplinesRow, PerformanceRegistryRow, SpecializationsRow, StudentsRow, Teachers, TeachersRow, UniversitiesRow}
+import generators._
 import slick.dbio.DBIO
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -19,7 +19,7 @@ object DatabasePopulator {
 
   def populateDatabase()(implicit ec: ExecutionContext): Future[Unit] = {
 
-    val dbAction = for{
+    val dbAction = for {
       universities <- createUniversities()
       departments <- createDepartments(universities)
       specializations <- createSpecializations(departments)
@@ -34,7 +34,7 @@ object DatabasePopulator {
 
   private def createUniversities()(implicit ec: ExecutionContext): DBIO[Seq[UniversitiesRow]] = {
     val universitiesToSave = UniversitiesGenerator.createUniversityRows
-    for{
+    for {
       _ <- UniversitiesDao.saveAll(universitiesToSave)
       universities <- UniversitiesDao.getAll
       _ = println("Universities created")
@@ -43,7 +43,7 @@ object DatabasePopulator {
 
   private def createDepartments(universities: Seq[UniversitiesRow])(implicit ec: ExecutionContext): DBIO[Seq[DepartmentsRow]] = {
     val deptsToSave = universities.flatMap(uni => generateDepartmentsForUniversityId(uni.id, DepartmentsNumber))
-    for{
+    for {
       _ <- DepartmentsDao.saveAll(deptsToSave)
       depts <- DepartmentsDao.getAll
       _ = println("Departments created")
@@ -52,7 +52,7 @@ object DatabasePopulator {
 
   private def createSpecializations(depts: Seq[DepartmentsRow])(implicit ec: ExecutionContext): DBIO[Seq[SpecializationsRow]] = {
     val specsToSave = depts.flatMap(dept => SpecializationsGenerator.generateForDepartment(dept.id, SpecializationNumber))
-    for{
+    for {
       _ <- SpecializationsDao.saveAll(specsToSave)
       specs <- SpecializationsDao.getAll
       _ = println("Specializations created")
@@ -60,12 +60,12 @@ object DatabasePopulator {
   }
 
   private def createDisciplines(specs: Seq[SpecializationsRow])(implicit ec: ExecutionContext): DBIO[Seq[DisciplinesRow]] = {
-    val discToSave = for{
+    val discToSave = for {
       _ <- 1 to DisciplinesNumber
       spec <- specs
     } yield DisciplinesGenerator.generateForSpecialization(spec)
 
-    for{
+    for {
       _ <- DisciplinesDao.saveAll(discToSave)
       discs <- DisciplinesDao.getAll
       _ = println("Disciplines created")
@@ -75,7 +75,7 @@ object DatabasePopulator {
   private def createStudents()(implicit ec: ExecutionContext): DBIO[Seq[StudentsRow]] = {
     val studentsToSave = PersonGenerator.generateMany(StudentsNumber).map(PersonGenerator.toStudent)
 
-    for{
+    for {
       _ <- StudentsDao.saveAll(studentsToSave)
       studs <- StudentsDao.getAll
       _ = println("Students created")
@@ -85,7 +85,7 @@ object DatabasePopulator {
   private def createTeachers()(implicit ec: ExecutionContext): DBIO[Seq[TeachersRow]] = {
     val teachersToSave = PersonGenerator.generateMany(TeachersNumber).map(PersonGenerator.toTeacher)
 
-    for{
+    for {
       _ <- TeachersDao.saveAll(teachersToSave)
       teachers <- TeachersDao.getAll
       _ = println("Teachers created")
@@ -96,11 +96,11 @@ object DatabasePopulator {
                                  studs: Seq[StudentsRow],
                                  teachers: Seq[TeachersRow])
                                 (implicit ec: ExecutionContext): DBIO[Seq[PerformanceRegistryRow]] = {
-    val perfEntriesToSave = for{
+    val perfEntriesToSave = for {
       _ <- 1 to PerfEntriesNumber
     } yield PerformanceRegistryGenerator.generate(discs, teachers, studs)
 
-    for{
+    for {
       _ <- PerformanceRegistryDao.saveAll(perfEntriesToSave)
       perfEntries <- PerformanceRegistryDao.getAll
       _ = println("Performance registry created")

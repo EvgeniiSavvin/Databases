@@ -4,12 +4,27 @@ version := "0.1"
 
 scalaVersion := "2.13.5"
 
+val circeVersion = "0.14.1"
+val slickVersion = "3.3.3"
+
+val circeDependencies = Seq(
+  "io.circe" %% "circe-core",
+  "io.circe" %% "circe-generic",
+  "io.circe" %% "circe-parser"
+).map(_ % circeVersion)
+
+val slickDependencies = Seq(
+  "com.typesafe.slick" %% "slick",
+  "com.typesafe.slick" %% "slick-hikaricp",
+  "com.typesafe.slick" %% "slick-codegen"
+).map(_ % slickVersion)
+
+libraryDependencies ++= circeDependencies
+libraryDependencies ++= slickDependencies
+
 libraryDependencies ++= Seq(
-  "com.typesafe.slick" %% "slick" % "3.3.3",
   "org.slf4j" % "slf4j-nop" % "1.7.19",
-  "com.typesafe.slick" %% "slick-hikaricp" % "3.3.3",
-  "org.postgresql" % "postgresql" % "42.2.5",
-  "com.typesafe.slick" %% "slick-codegen" % "3.3.3"
+  "org.postgresql" % "postgresql" % "42.2.5"
 )
 
 Compile / sourceGenerators += slick.taskValue // Automatic code generation on build
